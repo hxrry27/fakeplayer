@@ -4,11 +4,12 @@
 
 ## Prerequisites
 
-- JDK 21 (required for Gradle toolchain)
+- JDK 21 (required to run Gradle for this project)
+- JDK 25 (required as a Gradle toolchain for Minecraft 26.1.x support)
 - Git
 - Internet access for Gradle dependency resolution
 
-> The project compiles with `--release 17`, but the Gradle toolchain is set to JDK 21.
+> Most modules compile with JDK 21. The 26.1.x NMS module uses a JDK 25 toolchain while still emitting Java 21 bytecode.
 
 ## Setup
 
@@ -46,6 +47,8 @@ By default, Gradle will resolve Spigot from Maven. If you want to use a local ja
    - `spigot-<mcVersion>.jar`
 
 Gradle will automatically pick it up if present.
+
+For Minecraft 26.1.x, run BuildTools with Java 25 for `26.1.2`; Spigot no longer publishes or needs a `remapped-mojang` classifier for this version line.
 
 ## Optional: copy to local test servers
 
