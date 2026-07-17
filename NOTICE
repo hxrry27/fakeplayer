@@ -1,0 +1,17 @@
+fakeplayer
+Copyright 2026 hxrry27
+
+This product includes software developed by:
+
+  - tanyaofei (https://github.com/tanyaofei/minecraft-fakeplayer)
+    The original minecraft-fakeplayer plugin, licensed under the Apache License 2.0.
+
+  - CraftAmethyst (https://github.com/CraftAmethyst/fakeplayer-QM)
+    The fakeplayer-QM fork, licensed under the Apache License 2.0, from which this
+    fork is derived.
+
+Portions of the fake player action handling (see the Tracer and action classes in the
+NMS modules) are derived from gnembon/fabric-carpet (https://github.com/gnembon/fabric-carpet),
+licensed under the MIT License.
+
+This product is licensed under the Apache License, Version 2.0. See LICENSE.txt.
