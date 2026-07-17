@@ -5,8 +5,7 @@ import com.google.inject.Singleton;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import dev.jorel.commandapi.executors.CommandArguments;
-import io.github.hello09x.devtools.core.translation.TranslatorUtils;
-import io.github.hello09x.devtools.core.utils.ComponentUtils;
+import io.github.hello09x.fakeplayer.core.util.ComponentUtils;
 import io.github.hello09x.fakeplayer.core.manager.invsee.InvseeManager;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +32,7 @@ public class InvseeCommand extends AbstractCommand {
         if (!Objects.equals(sender.getLocation().getWorld(), fake.getLocation().getWorld())) {
             throw CommandAPI.failWithString(ComponentUtils.toString(
                     translatable("fakeplayer.command.invsee.error.not-the-same-world"),
-                    TranslatorUtils.getLocale(sender)
+                    localeOf(sender)
             ));
         }
         invseeManager.invsee(sender, fake);

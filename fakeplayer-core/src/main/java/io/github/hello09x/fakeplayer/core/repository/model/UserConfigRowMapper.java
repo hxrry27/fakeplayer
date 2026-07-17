@@ -1,6 +1,6 @@
 package io.github.hello09x.fakeplayer.core.repository.model;
 
-import io.github.hello09x.devtools.database.jdbc.RowMapper;
+import io.github.hello09x.fakeplayer.core.repository.jdbc.RowMapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

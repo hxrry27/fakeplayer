@@ -2,8 +2,8 @@ package io.github.hello09x.fakeplayer.core.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.github.hello09x.devtools.database.jdbc.JdbcTemplate;
-import io.github.hello09x.devtools.database.jdbc.rowmapper.BooleanRowMapper;
+import io.github.hello09x.fakeplayer.core.repository.jdbc.JdbcTemplate;
+import io.github.hello09x.fakeplayer.core.repository.jdbc.BooleanRowMapper;
 import io.github.hello09x.fakeplayer.core.repository.model.FakePlayerProfile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

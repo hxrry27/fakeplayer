@@ -1,6 +1,6 @@
 package io.github.hello09x.fakeplayer.core.manager.invsee;
 
-import io.github.hello09x.devtools.core.utils.ComponentUtils;
+import io.github.hello09x.fakeplayer.core.util.ComponentUtils;
 import io.github.hello09x.fakeplayer.core.manager.FakeplayerList;
 import io.github.hello09x.fakeplayer.core.manager.FakeplayerManager;
 import org.bukkit.Bukkit;

@@ -1,9 +1,9 @@
 package io.github.hello09x.fakeplayer.core.entity;
 
 import io.github.hello09x.devtools.command.exception.CommandException;
-import io.github.hello09x.devtools.core.utils.EntityUtils;
-import io.github.hello09x.devtools.core.utils.SchedulerUtils;
-import io.github.hello09x.devtools.core.utils.WorldUtils;
+import io.github.hello09x.fakeplayer.core.util.EntityUtils;
+import io.github.hello09x.fakeplayer.core.util.SchedulerUtils;
+import io.github.hello09x.fakeplayer.core.util.WorldUtils;
 import io.github.hello09x.fakeplayer.api.spi.*;
 import io.github.hello09x.fakeplayer.core.Main;
 import io.github.hello09x.fakeplayer.core.config.FakeplayerConfig;

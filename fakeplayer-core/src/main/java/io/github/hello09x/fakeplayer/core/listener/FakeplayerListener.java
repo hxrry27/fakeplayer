@@ -2,8 +2,8 @@ package io.github.hello09x.fakeplayer.core.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.github.hello09x.devtools.core.utils.ComponentUtils;
-import io.github.hello09x.devtools.core.utils.MetadataUtils;
+import io.github.hello09x.fakeplayer.core.util.ComponentUtils;
+import io.github.hello09x.fakeplayer.core.util.MetadataUtils;
 import io.github.hello09x.fakeplayer.core.Main;
 import io.github.hello09x.fakeplayer.core.config.FakeplayerConfig;
 import io.github.hello09x.fakeplayer.core.constant.MetadataKeys;

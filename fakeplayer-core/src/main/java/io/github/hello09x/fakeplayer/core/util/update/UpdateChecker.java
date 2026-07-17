@@ -1,8 +1,8 @@
 package io.github.hello09x.fakeplayer.core.util.update;
 
 import com.google.gson.Gson;
-import io.github.hello09x.devtools.core.version.InvalidVersionException;
-import io.github.hello09x.devtools.core.version.Version;
+import io.github.hello09x.fakeplayer.core.util.update.InvalidVersionException;
+import io.github.hello09x.fakeplayer.core.util.update.Version;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

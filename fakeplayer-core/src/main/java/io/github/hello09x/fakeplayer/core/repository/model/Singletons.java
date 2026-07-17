@@ -1,6 +1,6 @@
 package io.github.hello09x.fakeplayer.core.repository.model;
 
-import io.github.hello09x.devtools.core.utils.SingletonSupplier;
+import io.github.hello09x.fakeplayer.core.util.SingletonSupplier;
 import io.github.hello09x.fakeplayer.core.Main;
 import io.github.hello09x.fakeplayer.core.manager.FakeplayerAutofishManager;
 import io.github.hello09x.fakeplayer.core.manager.FakeplayerAutosleepManager;

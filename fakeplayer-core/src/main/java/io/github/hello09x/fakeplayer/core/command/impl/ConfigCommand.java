@@ -5,8 +5,7 @@ import com.google.inject.Singleton;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import dev.jorel.commandapi.executors.CommandArguments;
-import io.github.hello09x.devtools.core.translation.TranslatorUtils;
-import io.github.hello09x.devtools.core.utils.ComponentUtils;
+import io.github.hello09x.fakeplayer.core.util.ComponentUtils;
 import io.github.hello09x.fakeplayer.core.Main;
 import io.github.hello09x.fakeplayer.core.manager.feature.FakeplayerFeatureManager;
 import io.github.hello09x.fakeplayer.core.repository.model.Feature;
@@ -42,7 +41,7 @@ public class ConfigCommand extends AbstractCommand {
         if (!feature.testPermissions(sender)) {
             throw CommandAPI.failWithString(ComponentUtils.toString(
                     translatable("fakeplayer.command.config.set.error.no-permission"),
-                    TranslatorUtils.getLocale(sender)
+                    localeOf(sender)
             ));
         }
 

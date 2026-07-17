@@ -7,7 +7,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.github.hello09x.devtools.core.utils.SchedulerUtils;
+import io.github.hello09x.fakeplayer.core.util.SchedulerUtils;
 import io.github.hello09x.fakeplayer.core.Main;
 import io.github.hello09x.fakeplayer.core.config.FakeplayerConfig;
 import io.github.hello09x.fakeplayer.core.repository.FakeplayerSkinRepository;

@@ -3,7 +3,7 @@ package io.github.hello09x.fakeplayer.core.repository;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.github.hello09x.devtools.core.utils.Exceptions;
+import io.github.hello09x.fakeplayer.core.util.Exceptions;
 import io.github.hello09x.fakeplayer.core.Main;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
