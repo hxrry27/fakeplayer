@@ -3,13 +3,11 @@ package io.github.hello09x.fakeplayer.core;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.github.hello09x.devtools.command.CommandModule;
-import io.github.hello09x.devtools.core.TranslationModule;
-import io.github.hello09x.devtools.core.translation.TranslationConfig;
-import io.github.hello09x.devtools.core.translation.TranslatorUtils;
-import io.github.hello09x.devtools.core.utils.Exceptions;
-import io.github.hello09x.devtools.database.DatabaseModule;
+import com.zaxxer.hikari.HikariDataSource;
+import io.github.hello09x.fakeplayer.core.util.Exceptions;
 import io.github.hello09x.fakeplayer.core.command.CommandRegistry;
 import io.github.hello09x.fakeplayer.core.config.FakeplayerConfig;
+import io.github.hello09x.fakeplayer.core.i18n.Adventure5Translator;
 import io.github.hello09x.fakeplayer.core.listener.FakeplayerLifecycleListener;
 import io.github.hello09x.fakeplayer.core.listener.FakeplayerListener;
 import io.github.hello09x.fakeplayer.core.listener.PlayerListener;
@@ -52,12 +50,12 @@ public final class Main extends JavaPlugin {
     public void onEnable() {
         injector = Guice.createInjector(
                 new FakeplayerModule(),
-                new CommandModule(),
-                new DatabaseModule(),
-                new TranslationModule(new TranslationConfig(
-                        "message/message",
-                        TranslatorUtils.getDefaultLocale(Main.getInstance())))
+                new CommandModule()
         );
+
+        injector.getInstance(FakeplayerConfig.class).reload();
+
+        injector.getInstance(Adventure5Translator.class);
 
         injector.getInstance(CommandRegistry.class).register();
         {
@@ -101,7 +99,7 @@ public final class Main extends JavaPlugin {
     public void checkForUpdatesAsync() {
         CompletableFuture.runAsync(() -> {
             var meta = this.getPluginMeta();
-            var checker = new UpdateChecker("tanyaofei", "minecraft-fakeplayer");
+            var checker = new UpdateChecker("hxrry27", "fakeplayer");
             try {
                 var release = checker.getLastRelease();
 
@@ -134,6 +132,7 @@ public final class Main extends JavaPlugin {
             Exceptions.suppress(this, () -> injector.getInstance(FakeplayerAutosleepManager.class).onDisable());
             Exceptions.suppress(this, () -> injector.getInstance(FakeplayerManager.class).onDisable());
             Exceptions.suppress(this, () -> injector.getInstance(UsedIdRepository.class).onDisable());
+            Exceptions.suppress(this, () -> injector.getInstance(HikariDataSource.class).close());
         }
 
         {

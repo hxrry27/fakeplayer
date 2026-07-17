@@ -4,8 +4,6 @@ package io.github.hello09x.fakeplayer.core.config;
 import com.google.common.annotations.Beta;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.github.hello09x.devtools.core.config.ConfigUtils;
-import io.github.hello09x.devtools.core.config.PluginConfig;
 import io.github.hello09x.fakeplayer.core.Main;
 import io.github.hello09x.fakeplayer.core.repository.model.Feature;
 import lombok.Getter;
@@ -30,7 +28,7 @@ import static net.kyori.adventure.text.Component.translatable;
 @Getter
 @ToString
 @Singleton
-public class FakeplayerConfig extends PluginConfig {
+public class FakeplayerConfig {
 
     private final static Logger log = Main.getInstance().getLogger();
 
@@ -131,6 +129,12 @@ public class FakeplayerConfig extends PluginConfig {
      */
     private Pattern namePattern;
 
+    private NameGate nameGate;
+
+    private Set<String> nameAllowlistNames;
+
+    private Set<UUID> nameAllowlistIds;
+
     /**
      * 检测更新
      */
@@ -173,15 +177,49 @@ public class FakeplayerConfig extends PluginConfig {
 
     @Inject
     public FakeplayerConfig() {
-        super(Main.getInstance());
+    }
+
+    public void reload() {
+        var plugin = Main.getInstance();
+        plugin.saveDefaultConfig();
+        plugin.reloadConfig();
+        this.reload(plugin.getConfig());
+    }
+
+    public boolean isConfigFileOutOfDate() {
+        var config = Main.getInstance().getConfig();
+        var defaults = config.getDefaults();
+        if (defaults == null) {
+            return false;
+        }
+
+        var bundled = defaults.getString("version");
+        return bundled != null && !bundled.equals(config.getString("version"));
     }
 
     private static int maxIfZero(int value) {
         return value <= 0 ? Integer.MAX_VALUE : value;
     }
 
-    @Override
-    protected void reload(@NotNull FileConfiguration file) {
+    private static <T extends Enum<T>> @NotNull T getEnum(
+            @NotNull FileConfiguration file,
+            @NotNull String path,
+            @NotNull Class<T> type,
+            @NotNull T def
+    ) {
+        var value = file.getString(path);
+        if (value == null || value.isBlank()) {
+            return def;
+        }
+        try {
+            return Enum.valueOf(type, value.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            log.warning("Invalid %s: %s".formatted(path, value));
+            return def;
+        }
+    }
+
+    private void reload(@NotNull FileConfiguration file) {
         this.playerLimit = maxIfZero(file.getInt("player-limit", 1));
         this.serverLimit = maxIfZero(file.getInt("server-limit", 1000));
         this.followQuiting = file.getBoolean("follow-quiting", true);
@@ -197,8 +235,10 @@ public class FakeplayerConfig extends PluginConfig {
         this.dropInventoryOnQuiting = file.getBoolean("drop-inventory-on-quiting", true);
         this.persistData = file.getBoolean("persist-data", true);
         this.kickOnDead = file.getBoolean("kick-on-dead", true);
-        this.checkForUpdates = file.getBoolean("check-for-updates", true);
+        this.checkForUpdates = file.getBoolean("check-for-updates", false);
         this.namePattern = getNamePattern(file);
+        this.nameGate = getEnum(file, "name-gate", NameGate.class, NameGate.PLAYED_BEFORE);
+        this.setNameAllowlist(file.getStringList("name-allowlist"));
         this.preventKicking = this.getPreventKicking(file);
         this.nameTemplate = getNameTemplate(file);
         this.namePrefix = file.getString("name-prefix", "");
@@ -212,7 +252,7 @@ public class FakeplayerConfig extends PluginConfig {
         this.defaultOnlineSkin = file.getBoolean("default-online-skin", false);
         this.defaultFeatures = Arrays.stream(Feature.values())
                 .collect(Collectors.toMap(Function.identity(), key -> file.getString("default-features." + key.name(), key.getDefaultOption())));
-        this.invseeImplement = ConfigUtils.getEnum(file, "invsee-implement", InvseeImplement.class, InvseeImplement.AUTO);
+        this.invseeImplement = getEnum(file, "invsee-implement", InvseeImplement.class, InvseeImplement.AUTO);
         this.debug = file.getBoolean("debug", false);
         this.nameStyleColor = this.getNameStyleColor(file);
         this.nameStyleDecorations = this.getNameStyleDecorations(file);
@@ -252,6 +292,29 @@ public class FakeplayerConfig extends PluginConfig {
     }
 
 
+    private void setNameAllowlist(@NotNull List<String> entries) {
+        var names = new HashSet<String>();
+        var ids = new HashSet<UUID>();
+        for (var entry : entries) {
+            var value = entry.trim();
+            if (value.isEmpty()) {
+                continue;
+            }
+            try {
+                ids.add(UUID.fromString(value));
+            } catch (IllegalArgumentException e) {
+                names.add(value.toLowerCase(Locale.ROOT));
+            }
+        }
+        this.nameAllowlistNames = Set.copyOf(names);
+        this.nameAllowlistIds = Set.copyOf(ids);
+    }
+
+    public boolean isNameAllowed(@NotNull String name, @NotNull UUID uuid) {
+        return this.nameAllowlistIds.contains(uuid)
+                || this.nameAllowlistNames.contains(name.toLowerCase(Locale.ROOT));
+    }
+
     private @NotNull Pattern getNamePattern(@NotNull FileConfiguration file) {
         try {
             return Pattern.compile(file.getString("name-pattern", defaultNameChars));
@@ -276,7 +339,7 @@ public class FakeplayerConfig extends PluginConfig {
             return PreventKicking.ON_SPAWNING;
         }
 
-        return ConfigUtils.getEnum(file, "prevent-kicking", PreventKicking.class, PreventKicking.ON_SPAWNING);
+        return getEnum(file, "prevent-kicking", PreventKicking.class, PreventKicking.ON_SPAWNING);
     }
 
     private @NotNull NamedTextColor getNameStyleColor(@NotNull FileConfiguration file) {

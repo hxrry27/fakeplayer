@@ -7,9 +7,7 @@ plugins {
 }
 
 dependencies {
-    api libs.com.github.tanyaofei.devtools.devtools.core
     api libs.com.github.tanyaofei.devtools.devtools.command
-    api libs.com.github.tanyaofei.devtools.devtools.database
     compileOnly libs.io.papermc.paper.paper.api
     compileOnly libs.org.projectlombok.lombok
     compileOnly libs.com.mojang.authlib

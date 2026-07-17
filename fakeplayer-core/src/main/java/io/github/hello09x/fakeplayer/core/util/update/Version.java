@@ -4,9 +4,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Pattern;
 
-/**
- * A `1.2.3` style version, used only to compare the local and remote versions.
- */
 public record Version(int major, int minor, int patch) implements Comparable<Version> {
 
     private final static Pattern PATTERN = Pattern.compile("^(\\d+)(?:\\.(\\d+))?(?:\\.(\\d+))?");
