@@ -1,9 +1,9 @@
 name: fakeplayer
 version: '${revision}'
 main: io.github.hello09x.fakeplayer.core.Main
-api-version: '1.20'
-author: hello09x
-website: 'https://github.com/tanyaofei/minecraft-fakeplayer'
+api-version: '26.2' #26.2 is the chosen support floor
+author: hxrry
+website: 'https://github.com/hxrry27/fakeplayer'
 depend:
   - CommandAPI
 
