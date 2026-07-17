@@ -6,7 +6,11 @@ A fork of FakePlayer maintained by CraftAmethyst.
 
 English | [简体中文](README_zh.md)
 
-This is a server side plugin inspired by [Carpet-Mod](https://github.com/gnembon/fabric-carpet) for Minecraft `1.20.x` and `1.21.x` and above.
+This is a server side plugin inspired by [Carpet-Mod](https://github.com/gnembon/fabric-carpet) for Minecraft.
+
+> This fork targets the most recent paper version, and builds against Paper's paperweight dev
+> bundles (no Spigot/BuildTools). Support for `1.20.x`/`1.21.x` was removed; use
+> [fakeplayer-QM](https://github.com/CraftAmethyst/fakeplayer-QM) for those versions.
 
 [Click me](https://youtu.be/NePaDz-P5nI) to visit a demo video.
 
