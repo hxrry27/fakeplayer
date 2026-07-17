@@ -7,7 +7,7 @@ This is a server side plugin inspired by [Carpet-Mod](https://github.com/gnembon
 ## Features
 
 + Emulates the `/player` command from carpet, for paper/purpur servers
-+ Each player has it's own configuration
++ Each player has it's own configuration 
 
 ## Commands
 
