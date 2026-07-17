@@ -1,44 +1,13 @@
-# FakePlayer - QM
+# FakePlayer
 
-A fork of FakePlayer maintained by CraftAmethyst.
+A fork of FakePlayer maintained by hxrry27
 
-![BANNER_IMAGE](.github/README/BANNER.png)
-
-English | [简体中文](README_zh.md)
-
-This is a server side plugin inspired by [Carpet-Mod](https://github.com/gnembon/fabric-carpet) for Minecraft.
-
-> This fork targets the most recent paper version, and builds against Paper's paperweight dev
-> bundles (no Spigot/BuildTools). Support for `1.20.x`/`1.21.x` was removed; use
-> [fakeplayer-QM](https://github.com/CraftAmethyst/fakeplayer-QM) for those versions.
-
-[Click me](https://youtu.be/NePaDz-P5nI) to visit a demo video.
-
-## Compared to the original project, we have:
-
-+ More active maintenance and updates to support the latest Minecraft versions.
-+ Convert projects from Maven to Gradle to simplify the build process.
+This is a server side plugin inspired by [Carpet-Mod](https://github.com/gnembon/fabric-carpet) for Minecraft, aiming specifically at 26.X
 
 ## Features
 
-+ Lets you spawn fake players who look like real to the server, they can keep chunk loading
-+ Fake players can be recolonized by vanilla commands and plugin commands, such as `/ban`, `/tp`
-+ You can open and edit their inventory via `/fp invsee` or Right-Clicking on them
-+ You can fully control their moving, jumping, attacking... What's better ? Make it periodical
-+ Each player can configure his personal configuration
-
-## Requirements
-
-+ [Paper](https://papermc.io) or [Purpur](http://purpurmc.org) software
-+ [CommandAPI](https://commandapi.jorel.dev) Plugin (Any version **except** `10.0.0`)
-
-## Config file
-
-**Fakeplayer only generates a template config file named `config.tmpl.yml`.**
-You need to rename this file to `config.yml` as your configuration file.
-This approach can let you preview new content when you are upgrading it.
-
-[Click to visit file content](fakeplayer-core/src/main/resources/config.yml)
++ Emulates the `/player` command from carpet, for paper/purpur servers
++ Each player has it's own configuration
 
 ## Commands
 
@@ -83,15 +52,8 @@ This approach can let you preview new content when you are upgrading it.
 | /fp cmd       | Execute command                           | fakeplayer.command.cmd       |                                                                 |
 | /fp reload    | Reload config file                        | OP                           |                                                                 |
 
-## Personal Configuration
 
-**Each player** can configure his **own** configuration, it will take effect on the next spawning
-
-Command examples:
-
-+ `/fp config list` - View all personalized configurations
-+ `/fp config set collidable false` - Set personalized configuration
-
+## Config
 
 | Configuration Item | Note                                                                                                                               |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
@@ -106,10 +68,7 @@ Command examples:
 
 ## Permissions
 
-<details>
-<summary>Click to visit</summary>
-
-Each command has its own permission node, but we provided some permissions packs
+On top of individual permission nodes noted in this readme, the below packs come as a default
 
 ### Permission `fakeplayer.spawn`
 
@@ -162,55 +121,8 @@ Each command has its own permission node, but we provided some permissions packs
 - fakeplayer.config.replenish.chest - Can replenish from nearby chests when auto-replenishing
 - fakeplayer.config.autofish - Autofish
 
-If your server does not restrict various player commands, you can use this directly.
-`fakeplayer.basic` includes all secure permissions, except for `/fp cmd` commands.
-
-</details>
-
 ## Placeholder Variables
 
 + `%fakeplayer_total%`: Total count of fake players
 + `%fakeplayer_creator%`: The creator name of a fake player
 + `%fakeplayer_actions`: Active actions of a fake player such as : `USE|ATTACK`
-
-# Custom Translation
-
-1. Create a `message` folder in `plugins/fakeplayer`
-2. Copy [this file](fakeplayer-core/src/main/resources/message/message.properties) to `message` folder
-3. Rename the file to `message_language_region.properties` such as `message_en_us.properties`
-4. Edit your `config.yml`, set `i18n.locale` to the name suffix which you just created such as `en_us`
-5. Type `/fp reload-translation` to reload translation file. If you change `i18n.local`, you should `/fp reload` first
-
-**Make sure the translation file is encoded with UTF-8**
-
-# FAQs
-
-## xxx lost connection: PacketEvents 2.0 failed to inject
-
-Some plugin changes the `Connection` of the fake player, You can set `prevent-kicking` to `ALWAYS` to solve it.
-
-```yaml
-# config.yml
-prevent-kicking: ALWAYS
-```
-
-## Fake players do not attract aggression
-
-By default, fake players are in invincible mode. Players need to manually turn off invincible mode with `/fp config set invulnerable false` to attract aggression. After turning it off, they will
-receive hunger and health effects. You may need to use `res` or beacon to ensure the fake player's `hunger` and `health`.
-
-## Fake players automatically log out after a while
-
-This may be because plugins like `AutheMe` detect that fake players have not logged in for a long time. You can include the login command in the configuration file's `self-commands` to prevent the
-plugin from kicking out players for being idle:
-
-```yaml
-# Note: You should use a complex password, or AuthMe may reject it
-self-commands:
-  - '/register abc123! abc123!'
-  - '/login abc123!'
-```
-
-# Build Project
-
-See the [introduction](./BUILD.md).
