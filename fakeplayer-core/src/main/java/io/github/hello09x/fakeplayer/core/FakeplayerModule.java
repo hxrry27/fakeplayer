@@ -12,9 +12,6 @@ import io.github.hello09x.fakeplayer.core.i18n.Adventure5Translator;
 import io.github.hello09x.fakeplayer.core.manager.FakeplayerList;
 import io.github.hello09x.fakeplayer.core.manager.FakeplayerManager;
 import io.github.hello09x.fakeplayer.core.manager.action.ActionManager;
-import io.github.hello09x.fakeplayer.core.manager.invsee.InvseeManager;
-import io.github.hello09x.fakeplayer.core.manager.invsee.OpenInvInvseeManagerImpl;
-import io.github.hello09x.fakeplayer.core.manager.invsee.SimpleInvseeManagerImpl;
 import io.github.hello09x.fakeplayer.core.placeholder.FakeplayerPlaceholderExpansion;
 import io.github.hello09x.fakeplayer.core.placeholder.FakeplayerPlaceholderExpansionImpl;
 import io.github.hello09x.fakeplayer.core.util.ClassUtils;
@@ -65,22 +62,6 @@ public class FakeplayerModule extends AbstractModule {
         var translator = new Adventure5Translator();
         translator.register();
         return translator;
-    }
-
-    @Provides
-    @Singleton
-    public @NotNull InvseeManager invseeManager(FakeplayerConfig config, FakeplayerManager fakeplayerManager, FakeplayerList fakeplayerList) {
-        return switch (config.getInvseeImplement()) {
-            case SIMPLE -> new SimpleInvseeManagerImpl(fakeplayerManager, fakeplayerList);
-            case AUTO -> {
-                if (Bukkit.getPluginManager().isPluginEnabled("OpenInv") && ClassUtils.isClassExists("com.lishid.openinv.IOpenInv")) {
-                    log.info("Using OpenInv as invsee implement");
-                    yield new OpenInvInvseeManagerImpl(fakeplayerManager, fakeplayerList);
-                }
-                log.info("Using simple invsee implement");
-                yield new SimpleInvseeManagerImpl(fakeplayerManager, fakeplayerList);
-            }
-        };
     }
 
     @Provides
