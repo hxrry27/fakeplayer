@@ -1,8 +1,8 @@
 # FakePlayer
 
-A fork of FakePlayer maintained by hxrry27
+A fork of a fork of FakePlayer maintained by hxrry27
 
-This is a server side plugin inspired by [Carpet-Mod](https://github.com/gnembon/fabric-carpet) for Minecraft, aiming specifically at 26.X
+This is a server side plugin inspired by [Carpet-Mod](https://github.com/gnembon/fabric-carpet) for Minecraft, aiming specifically at 26.2 >
 
 ## Features
 
