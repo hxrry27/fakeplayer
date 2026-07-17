@@ -1,6 +1,6 @@
 package io.github.hello09x.fakeplayer.core.entity;
 
-import io.github.hello09x.devtools.command.exception.CommandException;
+import io.github.hello09x.fakeplayer.core.command.CommandException;
 import io.github.hello09x.fakeplayer.core.util.EntityUtils;
 import io.github.hello09x.fakeplayer.core.util.SchedulerUtils;
 import io.github.hello09x.fakeplayer.core.util.WorldUtils;
@@ -193,6 +193,9 @@ public class Fakeplayer {
 
                     this.network = bridge.createNetwork(address);
                     this.network.placeNewPlayer(Bukkit.getServer(), this.player);
+                    this.player.getPersistentDataContainer().set(
+                            org.bukkit.NamespacedKey.fromString("fakeplayer:fake"),
+                            org.bukkit.persistence.PersistentDataType.BYTE, (byte) 1);
                     this.player.getInventory().setHeldItemSlot(option.heldSlot());
                     this.player.setHealth(Optional.ofNullable(this.player.getAttribute(Attributes.maxHealth()))
                             .map(AttributeInstance::getValue)

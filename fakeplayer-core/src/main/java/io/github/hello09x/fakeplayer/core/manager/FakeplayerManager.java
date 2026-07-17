@@ -2,7 +2,7 @@ package io.github.hello09x.fakeplayer.core.manager;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.github.hello09x.devtools.command.exception.CommandException;
+import io.github.hello09x.fakeplayer.core.command.CommandException;
 import io.github.hello09x.fakeplayer.core.util.Exceptions;
 import io.github.hello09x.fakeplayer.core.util.MetadataUtils;
 import io.github.hello09x.fakeplayer.api.spi.ActionSetting;

@@ -1,6 +1,6 @@
 package io.github.hello09x.fakeplayer.core.manager.naming.exception;
 
-import io.github.hello09x.devtools.command.exception.CommandException;
+import io.github.hello09x.fakeplayer.core.command.CommandException;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 

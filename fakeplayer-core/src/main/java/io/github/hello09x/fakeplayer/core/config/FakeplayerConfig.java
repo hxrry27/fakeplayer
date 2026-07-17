@@ -163,11 +163,6 @@ public class FakeplayerConfig {
     private PreventKicking preventKicking;
 
     /**
-     * invsee 实现方式
-     */
-    private InvseeImplement invseeImplement;
-
-    /**
      * 真实皮肤
      */
     @Beta
@@ -234,7 +229,7 @@ public class FakeplayerConfig {
         this.nameTemplate = file.getString("name-template", "");
         this.dropInventoryOnQuiting = file.getBoolean("drop-inventory-on-quiting", true);
         this.persistData = file.getBoolean("persist-data", true);
-        this.kickOnDead = file.getBoolean("kick-on-dead", true);
+        this.kickOnDead = true;   // forced on: the respawn command was removed, a dead bot must be kicked
         this.checkForUpdates = file.getBoolean("check-for-updates", false);
         this.namePattern = getNamePattern(file);
         this.nameGate = getEnum(file, "name-gate", NameGate.class, NameGate.PLAYED_BEFORE);
@@ -252,7 +247,6 @@ public class FakeplayerConfig {
         this.defaultOnlineSkin = file.getBoolean("default-online-skin", false);
         this.defaultFeatures = Arrays.stream(Feature.values())
                 .collect(Collectors.toMap(Function.identity(), key -> file.getString("default-features." + key.name(), key.getDefaultOption())));
-        this.invseeImplement = getEnum(file, "invsee-implement", InvseeImplement.class, InvseeImplement.AUTO);
         this.debug = file.getBoolean("debug", false);
         this.nameStyleColor = this.getNameStyleColor(file);
         this.nameStyleDecorations = this.getNameStyleDecorations(file);

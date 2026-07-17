@@ -2,10 +2,9 @@ package io.github.hello09x.fakeplayer.core;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import io.github.hello09x.devtools.command.CommandModule;
 import com.zaxxer.hikari.HikariDataSource;
 import io.github.hello09x.fakeplayer.core.util.Exceptions;
-import io.github.hello09x.fakeplayer.core.command.CommandRegistry;
+import io.github.hello09x.fakeplayer.core.command.PlayerCommand;
 import io.github.hello09x.fakeplayer.core.config.FakeplayerConfig;
 import io.github.hello09x.fakeplayer.core.i18n.Adventure5Translator;
 import io.github.hello09x.fakeplayer.core.listener.FakeplayerLifecycleListener;
@@ -17,7 +16,6 @@ import io.github.hello09x.fakeplayer.core.manager.FakeplayerManager;
 import io.github.hello09x.fakeplayer.core.manager.FakeplayerReplenishManager;
 import io.github.hello09x.fakeplayer.core.manager.PersistentFakeplayerManager;
 import io.github.hello09x.fakeplayer.core.manager.WildFakeplayerManager;
-import io.github.hello09x.fakeplayer.core.manager.invsee.InvseeManager;
 import io.github.hello09x.fakeplayer.core.placeholder.FakeplayerPlaceholderExpansion;
 import io.github.hello09x.fakeplayer.core.repository.UsedIdRepository;
 import io.github.hello09x.fakeplayer.core.util.update.UpdateChecker;
@@ -49,15 +47,14 @@ public final class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         injector = Guice.createInjector(
-                new FakeplayerModule(),
-                new CommandModule()
+                new FakeplayerModule()
         );
 
         injector.getInstance(FakeplayerConfig.class).reload();
 
         injector.getInstance(Adventure5Translator.class);
 
-        injector.getInstance(CommandRegistry.class).register();
+        injector.getInstance(PlayerCommand.class).register(this);
         {
             var messenger = getServer().getMessenger();
             messenger.registerIncomingPluginChannel(this, "BungeeCord", injector.getInstance(WildFakeplayerManager.class));
@@ -72,7 +69,6 @@ public final class Main extends JavaPlugin {
             manager.registerEvents(injector.getInstance(FakeplayerAutofishManager.class), this);
             manager.registerEvents(injector.getInstance(FakeplayerAutosleepManager.class), this);
             manager.registerEvents(injector.getInstance(FakeplayerReplenishManager.class), this);
-            manager.registerEvents(injector.getInstance(InvseeManager.class), this);
         }
 
         // Start autosleep scheduler
