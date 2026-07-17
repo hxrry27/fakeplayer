@@ -55,6 +55,9 @@ public abstract class BaseActionTicker implements ActionTicker {
         }
 
         try {
+            if (this.setting.interval == 1) {
+                this.inactiveTick();
+            }
             if (this.action.tick()) {
                 if (this.setting.remains > 0) {
                     this.setting.remains--;
@@ -62,7 +65,7 @@ public abstract class BaseActionTicker implements ActionTicker {
             }
         } finally {
             // 声音更新抑制器会抛出异常, 但同样需要进入冷却
-            this.setting.wait = this.setting.interval;
+            this.setting.wait = Math.max(0, this.setting.interval - 1);
         }
 
         return false;
