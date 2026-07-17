@@ -11,33 +11,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK
+      - name: Set up JDKs
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: |
+            21
+            25
           cache: 'gradle'
 
-      - name: Set up JDK 25 for BuildTools
-        uses: actions/setup-java@v4
+      - name: Cache paperweight setup
+        uses: actions/cache@v4
         with:
-          distribution: 'temurin'
-          java-version: '25'
-          cache: 'maven'
-
-      - name: Build Spigot 26.1.2
-        run: |
-          mkdir -p build/buildtools
-          cd build/buildtools
-          curl -fsSL -o BuildTools.jar https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
-          java -jar BuildTools.jar --rev 26.1.2 --compile SPIGOT
-
-      - name: Restore JDK 21 for Gradle
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-          cache: 'gradle'
+          path: |
+            fakeplayer-v26_*/.gradle/caches/paperweight
+            ~/.gradle/caches/paperweight
+          key: paperweight-${{ runner.os }}-${{ hashFiles('build.gradle') }}
+          restore-keys: |
+            paperweight-${{ runner.os }}-
 
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
@@ -50,4 +41,4 @@ jobs:
         with:
           name: fakeplayer-jar
           path: target/libs/*.jar
-          if-no-files-found: ignore
+          if-no-files-found: error

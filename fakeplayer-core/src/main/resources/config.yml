@@ -1,9 +1,6 @@
 # DO NOT EDIT
 version: 20
 
-i18n:
-  locale: zh
-
 # Define the maximum number of fake players on the server at the same time
 # default: 1000
 server-limit: 1000

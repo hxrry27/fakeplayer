@@ -1,5 +1,6 @@
 plugins {
-    id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
+    id 'com.gradleup.shadow' version '9.6.0' apply false
+    id 'io.papermc.paperweight.userdev' version '2.0.0-beta.21' apply false
 }
 
 import org.gradle.api.attributes.java.TargetJvmVersion
@@ -7,14 +8,15 @@ import org.gradle.api.attributes.java.TargetJvmVersion
 def revisionValue = (findProperty('revision') ?: '0.3.21').toString()
 
 def versions = [
-    paperApi: '1.21.7-R0.1-SNAPSHOT',
+    paperApi: '26.2.build.60-beta',
     lombok: '1.18.44',
     devtools: (findProperty('devtoolsVersion') ?: '0.1.7-SNAPSHOT').toString(),
     authlib: '4.0.43',
     commandApi: '11.0.0',
     brigadier: '1.1.8',
     nettyTransport: '4.1.82.Final',
-    commonsIo: '2.15.1'
+    commonsIo: '2.15.1',
+    hikari: '5.1.0'
 ]
 
 def useJava = { Project p, int toolchainVersion, int releaseVersion ->
@@ -22,7 +24,6 @@ def useJava = { Project p, int toolchainVersion, int releaseVersion ->
         toolchain {
             languageVersion = JavaLanguageVersion.of(toolchainVersion)
         }
-        // Keep dependency resolution aligned with toolchain; bytecode level is controlled by --release.
         sourceCompatibility = JavaVersion.toVersion(toolchainVersion)
         targetCompatibility = JavaVersion.toVersion(toolchainVersion)
     }
@@ -31,47 +32,30 @@ def useJava = { Project p, int toolchainVersion, int releaseVersion ->
     }
 }
 
+def consumeJava25 = { Project p ->
+    p.configurations.configureEach {
+        if (canBeResolved) {
+            attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 25)
+        }
+    }
+}
+
 def configureNms = { Project p, Map cfg ->
     def toolchainVersion = (cfg.toolchainVersion ?: cfg.javaVersion) as int
     useJava(p, toolchainVersion, cfg.javaVersion as int)
+    consumeJava25(p)
+
+    p.apply plugin: 'io.papermc.paperweight.userdev'
+
     p.dependencies {
-        compileOnly "com.github.tanyaofei.devtools:devtools-core:${versions.devtools}"
+        paperweightDevelopmentBundle "io.papermc.paper:dev-bundle:${cfg.devBundle}"
+
         if (cfg.coreProvided) {
             compileOnly project(':fakeplayer-core')
         } else {
             implementation project(':fakeplayer-core')
         }
         compileOnly project(':fakeplayer-api')
-        if (cfg.dependsOn) {
-            def depProject = project(cfg.dependsOn)
-            if (cfg.transitive == false) {
-                compileOnly(depProject) { transitive = false }
-            } else {
-                compileOnly depProject
-            }
-        }
-
-        def mcVersion = cfg.nmsVersion.toString().split('-R')[0]
-        def remappedMojang = cfg.remappedMojang != false
-        def spigotCandidates = remappedMojang ? [
-            "${rootDir}/lib/spigot-${cfg.nmsVersion}-remapped-mojang.jar",
-            "${rootDir}/lib/spigot-${mcVersion}-remapped-mojang.jar",
-            "${rootDir}/lib/spigot-${cfg.nmsVersion}.jar",
-            "${rootDir}/lib/spigot-${mcVersion}.jar"
-        ] : [
-            "${rootDir}/lib/spigot-${cfg.nmsVersion}.jar",
-            "${rootDir}/lib/spigot-${mcVersion}.jar"
-        ]
-        def spigotJar = spigotCandidates.collect { file(it) }.find { it.exists() }
-        if (spigotJar != null) {
-            compileOnly files(spigotJar)
-        } else if (remappedMojang) {
-            compileOnly("org.spigotmc:spigot:${cfg.nmsVersion}:remapped-mojang") {
-                exclude group: 'org.spigotmc', module: 'spigot-api'
-            }
-        } else {
-            compileOnly "org.spigotmc:spigot:${cfg.nmsVersion}"
-        }
 
         if (cfg.lombok) {
             compileOnly "org.projectlombok:lombok:${versions.lombok}"
@@ -85,10 +69,7 @@ allprojects {
     version = revisionValue
 
     repositories {
-        flatDir { dirs "${rootDir}/lib" }
         maven { url 'https://libraries.minecraft.net/' }
-        maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
-        maven { url 'https://hub.spigotmc.org/nexus/content/repositories/releases/' }
         maven { url 'https://maven.elmakers.com/repository/' }
         maven { url 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
         maven { url 'https://repo.papermc.io/repository/maven-public/' }
@@ -96,18 +77,6 @@ allprojects {
         maven { url 'https://repo.dmulloy2.net/repository/public/' }
         maven { url 'https://jitpack.io' }
         mavenCentral()
-    }
-
-    dependencies {
-        components {
-            withModule('org.spigotmc:spigot') {
-                allVariants {
-                    withCapabilities {
-                        removeCapability('org.spigotmc', 'spigot-api')
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -128,7 +97,8 @@ subprojects {
 }
 
 project(':fakeplayer-api') {
-    useJava(project, 21, 17)
+    useJava(project, 25, 21)
+    consumeJava25(project)
 
     dependencies {
         compileOnly "io.papermc.paper:paper-api:${versions.paperApi}"
@@ -138,7 +108,8 @@ project(':fakeplayer-api') {
 }
 
 project(':fakeplayer-core') {
-    useJava(project, 21, 17)
+    useJava(project, 25, 21)
+    consumeJava25(project)
 
     dependencies {
         compileOnly "io.papermc.paper:paper-api:${versions.paperApi}"
@@ -147,9 +118,8 @@ project(':fakeplayer-core') {
 
         compileOnly project(':fakeplayer-api')
 
-        implementation "com.github.tanyaofei.devtools:devtools-core:${versions.devtools}"
         implementation "com.github.tanyaofei.devtools:devtools-command:${versions.devtools}"
-        implementation "com.github.tanyaofei.devtools:devtools-database:${versions.devtools}"
+        implementation "com.zaxxer:HikariCP:${versions.hikari}"
 
         compileOnly "com.mojang:authlib:${versions.authlib}"
         compileOnly "dev.jorel:commandapi-paper-core:${versions.commandApi}"
@@ -170,39 +140,25 @@ project(':fakeplayer-core') {
 }
 
 project(':fakeplayer-dist') {
-    apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: 'com.gradleup.shadow'
 
     useJava(project, 21, 21)
 
     dependencies {
         implementation project(':fakeplayer-core')
         implementation project(':fakeplayer-api')
-        implementation project(':fakeplayer-v1_20_1')
-        implementation project(':fakeplayer-v1_20_2')
-        implementation project(':fakeplayer-v1_20_3')
-        implementation project(':fakeplayer-v1_20_4')
-        implementation project(':fakeplayer-v1_20_5')
-        implementation project(':fakeplayer-v1_20_6')
-        implementation project(':fakeplayer-v1_21')
-        implementation project(':fakeplayer-v1_21_1')
-        implementation project(':fakeplayer-v1_21_3')
-        implementation project(':fakeplayer-v1_21_4')
-        implementation project(':fakeplayer-v1_21_5')
-        implementation project(':fakeplayer-v1_21_6')
-        implementation project(':fakeplayer-v1_21_7')
-        implementation project(':fakeplayer-v1_21_8')
-        implementation project(':fakeplayer-v1_21_9')
-        implementation project(':fakeplayer-v1_21_10')
-        implementation project(':fakeplayer-v1_21_11')
-        implementation project(':fakeplayer-v26_1')
+        implementation project(':fakeplayer-v26_2')
     }
 
-    buildDir = file("${rootDir}/target")
+    layout.buildDirectory.set(file("${rootDir}/target"))
 
     tasks.shadowJar {
         archiveBaseName = 'fakeplayer'
         archiveVersion = project.version.toString()
         archiveClassifier = ''
+
+        exclude 'io/github/hello09x/devtools/core/translation/PluginTranslator*.class'
+        exclude 'io/github/hello09x/devtools/core/TranslationModule.class'
     }
 
     tasks.jar {
@@ -214,23 +170,7 @@ project(':fakeplayer-dist') {
     }
 
     def serverVersions = [
-        '1.20.1',
-        '1.20.2',
-        '1.20.6',
-        '1.21',
-        '1.21.1',
-        '1.21.3',
-        '1.21.4',
-        '1.21.5',
-        '1.21.6',
-        '1.21.7',
-        '1.21.8',
-        '1.21.9',
-        '1.21.10',
-        '1.21.11',
-        '26.1',
-        '26.1.1',
-        '26.1.2'
+        '26.2'
     ]
 
     tasks.register('copyToServers') {
@@ -250,148 +190,10 @@ project(':fakeplayer-dist') {
     }
 }
 
-configureNms(project(':fakeplayer-v1_20_1'), [
-    javaVersion: 17,
-    toolchainVersion: 21,
-    nmsVersion: '1.20.1-R0.1-SNAPSHOT',
-    lombok: true,
-    coreProvided: false
-])
-
-configureNms(project(':fakeplayer-v1_20_2'), [
-    javaVersion: 17,
-    toolchainVersion: 21,
-    nmsVersion: '1.20.2-R0.1-SNAPSHOT',
-    lombok: true,
-    coreProvided: true
-])
-
-configureNms(project(':fakeplayer-v1_20_3'), [
-    javaVersion: 17,
-    toolchainVersion: 21,
-    nmsVersion: '1.20.4-R0.1-SNAPSHOT',
-    lombok: false,
-    coreProvided: true,
-    dependsOn: ':fakeplayer-v1_20_4'
-])
-
-configureNms(project(':fakeplayer-v1_20_4'), [
-    javaVersion: 17,
-    toolchainVersion: 21,
-    nmsVersion: '1.20.4-R0.1-SNAPSHOT',
-    lombok: true,
-    coreProvided: true
-])
-
-configureNms(project(':fakeplayer-v1_20_5'), [
-    javaVersion: 17,
-    toolchainVersion: 21,
-    nmsVersion: '1.20.6-R0.1-SNAPSHOT',
-    lombok: false,
-    coreProvided: true,
-    dependsOn: ':fakeplayer-v1_20_6'
-])
-
-configureNms(project(':fakeplayer-v1_20_6'), [
-    javaVersion: 17,
-    toolchainVersion: 21,
-    nmsVersion: '1.20.6-R0.1-SNAPSHOT',
-    lombok: true,
-    coreProvided: true
-])
-
-configureNms(project(':fakeplayer-v1_21'), [
-    javaVersion: 21,
-    nmsVersion: '1.21-R0.1-SNAPSHOT',
-    lombok: true,
-    coreProvided: true
-])
-
-configureNms(project(':fakeplayer-v1_21_1'), [
-    javaVersion: 21,
-    nmsVersion: '1.21.1-R0.1-SNAPSHOT',
-    lombok: false,
-    coreProvided: true,
-    dependsOn: ':fakeplayer-v1_21',
-    transitive: false
-])
-
-configureNms(project(':fakeplayer-v1_21_3'), [
-    javaVersion: 21,
-    nmsVersion: '1.21.3-R0.1-SNAPSHOT',
-    lombok: true,
-    coreProvided: true
-])
-
-configureNms(project(':fakeplayer-v1_21_4'), [
-    javaVersion: 21,
-    nmsVersion: '1.21.4-R0.1-SNAPSHOT',
-    lombok: true,
-    coreProvided: true
-])
-
-configureNms(project(':fakeplayer-v1_21_5'), [
-    javaVersion: 21,
-    nmsVersion: '1.21.5-R0.1-SNAPSHOT',
-    lombok: true,
-    coreProvided: true
-])
-
-configureNms(project(':fakeplayer-v1_21_6'), [
-    javaVersion: 21,
-    nmsVersion: '1.21.6-R0.1-SNAPSHOT',
-    lombok: true,
-    coreProvided: true
-])
-
-configureNms(project(':fakeplayer-v1_21_7'), [
-    javaVersion: 21,
-    nmsVersion: '1.21.7-R0.1-SNAPSHOT',
-    lombok: false,
-    coreProvided: true,
-    dependsOn: ':fakeplayer-v1_21_6',
-    transitive: false
-])
-
-configureNms(project(':fakeplayer-v1_21_8'), [
-    javaVersion: 21,
-    nmsVersion: '1.21.8-R0.1-SNAPSHOT',
-    lombok: false,
-    coreProvided: true,
-    dependsOn: ':fakeplayer-v1_21_6',
-    transitive: false
-])
-
-configureNms(project(':fakeplayer-v1_21_9'), [
-    javaVersion: 21,
-    nmsVersion: '1.21.10-R0.1-SNAPSHOT',
-    lombok: true,
-    coreProvided: true
-])
-
-configureNms(project(':fakeplayer-v1_21_10'), [
-    javaVersion: 21,
-    nmsVersion: '1.21.10-R0.1-SNAPSHOT',
-    lombok: false,
-    coreProvided: true,
-    dependsOn: ':fakeplayer-v1_21_9',
-    transitive: false
-])
-
-configureNms(project(':fakeplayer-v1_21_11'), [
-    javaVersion: 21,
-    nmsVersion: '1.21.11-R0.1-SNAPSHOT',
-    lombok: false,
-    coreProvided: true,
-    dependsOn: ':fakeplayer-v1_21_9',
-    transitive: false
-])
-
-configureNms(project(':fakeplayer-v26_1'), [
+configureNms(project(':fakeplayer-v26_2'), [
     javaVersion: 21,
     toolchainVersion: 25,
-    nmsVersion: '26.1.2-R0.1-SNAPSHOT',
-    remappedMojang: false,
+    devBundle: '26.2.build.60-beta',
     lombok: true,
     coreProvided: true
 ])
