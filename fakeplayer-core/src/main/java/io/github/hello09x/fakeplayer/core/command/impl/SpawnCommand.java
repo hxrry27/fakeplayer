@@ -3,6 +3,7 @@ package io.github.hello09x.fakeplayer.core.command.impl;
 import com.google.common.base.Throwables;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.executors.CommandArguments;
+import dev.jorel.commandapi.wrappers.Rotation;
 import io.github.hello09x.devtools.command.exception.CommandException;
 import io.github.hello09x.devtools.command.exception.HandleCommandException;
 import io.github.hello09x.fakeplayer.core.Main;
@@ -53,6 +54,7 @@ public class SpawnCommand extends AbstractCommand {
         }
         var world = (World) args.get("world");
         var location = (Location) args.get("location");
+        var facing = (Rotation) args.get("facing");
 
         Location spawnpoint;
         if (world == null || location == null) {
@@ -66,6 +68,11 @@ public class SpawnCommand extends AbstractCommand {
                     location.getY(),
                     location.getZ()
             );
+        }
+
+        if (facing != null) {
+            spawnpoint.setYaw(facing.getYaw());
+            spawnpoint.setPitch(facing.getPitch());
         }
 
         var removedAt = Optional.ofNullable(config.getLifespan()).map(lifespan -> LocalDateTime.now().plus(lifespan)).orElse(null);

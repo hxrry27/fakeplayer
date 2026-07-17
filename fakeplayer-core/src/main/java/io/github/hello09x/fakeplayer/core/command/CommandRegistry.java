@@ -6,7 +6,7 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import io.github.hello09x.devtools.command.HelpCommand;
-import io.github.hello09x.devtools.core.utils.ComponentUtils;
+import io.github.hello09x.fakeplayer.core.util.ComponentUtils;
 import io.github.hello09x.fakeplayer.api.spi.ActionSetting;
 import io.github.hello09x.fakeplayer.api.spi.ActionType;
 import io.github.hello09x.fakeplayer.core.command.impl.*;
@@ -115,7 +115,8 @@ public class CommandRegistry {
                                 .withOptionalArguments(
                                         text("name").withPermission(Permission.spawnName),
                                         world("world").withPermission(Permission.spawnLocation),
-                                        location("location").withPermission(Permission.spawnLocation))
+                                        location("location").withPermission(Permission.spawnLocation),
+                                        rotation("facing").withPermission(Permission.spawnLocation))
                                 .executes(spawnCommand::spawn),
                         command("kill")
                                 .withPermission(Permission.kill)
@@ -307,6 +308,11 @@ public class CommandRegistry {
                                                 .withShortDescription("fakeplayer.command.look.down.description")
                                                 .withOptionalArguments(fakeplayer("name"))
                                                 .executes(rotationCommand.look(Direction.DOWN)),
+                                        command("to")
+                                                .withShortDescription("fakeplayer.command.look.to.description")
+                                                .withArguments(rotation("rotation"))
+                                                .withOptionalArguments(fakeplayer("name"))
+                                                .executes(rotationCommand::lookTo),
                                         command("at")
                                                 .withShortDescription("fakeplayer.command.look.at.description")
                                                 .withArguments(location("location"))

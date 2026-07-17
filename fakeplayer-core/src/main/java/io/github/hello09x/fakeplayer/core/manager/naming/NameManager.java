@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.hello09x.fakeplayer.core.Main;
 import io.github.hello09x.fakeplayer.core.config.FakeplayerConfig;
+import io.github.hello09x.fakeplayer.core.config.NameGate;
 import io.github.hello09x.fakeplayer.core.manager.naming.exception.IllegalCustomNameException;
 import io.github.hello09x.fakeplayer.core.repository.FakeplayerProfileRepository;
 import io.github.hello09x.fakeplayer.core.repository.UsedIdRepository;
@@ -160,7 +161,14 @@ public class NameManager {
 
         var player = Bukkit.getOfflinePlayer(name);
         var uuid = player.getUniqueId();
-        if (player.hasPlayedBefore() && !legacyUsedIdRepository.contains(uuid) && !profileRepository.existsByUUID(uuid)) {
+        if (config.getNameGate() == NameGate.ALLOWLIST) {
+            if (!config.isNameAllowed(name, uuid)) {
+                throw new IllegalCustomNameException(translatable(
+                        "fakeplayer.spawn.error.name.not-allowed",
+                        text(name, GOLD)
+                ).color(RED));
+            }
+        } else if (player.hasPlayedBefore() && !legacyUsedIdRepository.contains(uuid) && !profileRepository.existsByUUID(uuid)) {
             throw new IllegalCustomNameException(translatable(
                     "fakeplayer.spawn.error.name.used",
                     text(name, GOLD),

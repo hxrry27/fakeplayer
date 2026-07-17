@@ -64,6 +64,13 @@ public class RotationCommand extends AbstractCommand {
         }
     }
 
+
+    public void lookTo(@NotNull CommandSender sender, @NotNull CommandArguments args) throws WrapperCommandSyntaxException {
+        var fake = getFakeplayer(sender, args);
+        var rotation = Objects.requireNonNull((Rotation) args.get("rotation"));
+        this.look(fake, rotation.getYaw(), rotation.getPitch());
+    }
+
     /**
      * 看向指定方向
      */
