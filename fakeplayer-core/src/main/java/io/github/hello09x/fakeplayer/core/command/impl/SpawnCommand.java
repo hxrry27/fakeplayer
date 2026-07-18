@@ -21,6 +21,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
@@ -57,7 +58,16 @@ public class SpawnCommand extends AbstractCommand {
 
         var removedAt = Optional.ofNullable(config.getLifespan()).map(lifespan -> LocalDateTime.now().plus(lifespan)).orElse(null);
         var finalSpawn = spawnpoint;
-        manager.spawnAsync(sender, name, spawnpoint, Optional.ofNullable(config.getLifespan()).map(Duration::toMillis).orElse(FakeplayerTicker.NON_REMOVE_AT))
+
+        CompletableFuture<Player> future;
+        try {
+            future = manager.spawnAsync(sender, name, spawnpoint, Optional.ofNullable(config.getLifespan()).map(Duration::toMillis).orElse(FakeplayerTicker.NON_REMOVE_AT));
+        } catch (CommandException ce) {
+            sender.sendMessage(ce.component());
+            return;
+        }
+
+        future
                 .thenAcceptAsync(player -> {
                     if (player == null) {
                         return;

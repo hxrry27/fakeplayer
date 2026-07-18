@@ -156,8 +156,15 @@ project(':fakeplayer-dist') {
         archiveVersion = project.version.toString()
         archiveClassifier = ''
 
-        exclude 'io/github/hello09x/devtools/core/translation/PluginTranslator*.class'
-        exclude 'io/github/hello09x/devtools/core/TranslationModule.class'
+        dependencies {
+            exclude(dependency('com.google.guava:guava'))
+            exclude(dependency('com.google.guava:failureaccess'))
+            exclude(dependency('com.google.guava:listenablefuture'))
+            exclude(dependency('com.google.code.findbugs:jsr305'))
+            exclude(dependency('org.checkerframework:checker-qual'))
+            exclude(dependency('com.google.errorprone:error_prone_annotations'))
+            exclude(dependency('com.google.j2objc:j2objc-annotations'))
+        }
     }
 
     tasks.jar {

@@ -192,10 +192,10 @@ public class Fakeplayer {
                     }
 
                     this.network = bridge.createNetwork(address);
-                    this.network.placeNewPlayer(Bukkit.getServer(), this.player);
                     this.player.getPersistentDataContainer().set(
-                            org.bukkit.NamespacedKey.fromString("fakeplayer:fake"),
+                            new org.bukkit.NamespacedKey(Main.getInstance(), "fake"),
                             org.bukkit.persistence.PersistentDataType.BYTE, (byte) 1);
+                    this.network.placeNewPlayer(Bukkit.getServer(), this.player);
                     this.player.getInventory().setHeldItemSlot(option.heldSlot());
                     this.player.setHealth(Optional.ofNullable(this.player.getAttribute(Attributes.maxHealth()))
                             .map(AttributeInstance::getValue)
