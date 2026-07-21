@@ -159,16 +159,26 @@ public class NameManager {
             }
         }
 
-        var player = Bukkit.getOfflinePlayer(name);
-        var uuid = player.getUniqueId();
         if (config.getNameGate() == NameGate.ALLOWLIST) {
+            var uuid = resolveRealUuid(name);
+            if (uuid == null) {
+                throw new IllegalCustomNameException(translatable(
+                        "fakeplayer.spawn.error.name.unresolved",
+                        text(name, GOLD)
+                ).color(RED));
+            }
             if (!config.isNameAllowed(name, uuid)) {
                 throw new IllegalCustomNameException(translatable(
                         "fakeplayer.spawn.error.name.not-allowed",
                         text(name, GOLD)
                 ).color(RED));
             }
-        } else if (player.hasPlayedBefore() && !legacyUsedIdRepository.contains(uuid) && !profileRepository.existsByUUID(uuid)) {
+            return new SequenceName("custom", 0, uuid, name);
+        }
+
+        var player = Bukkit.getOfflinePlayer(name);
+        var uuid = player.getUniqueId();
+        if (player.hasPlayedBefore() && !legacyUsedIdRepository.contains(uuid) && !profileRepository.existsByUUID(uuid)) {
             throw new IllegalCustomNameException(translatable(
                     "fakeplayer.spawn.error.name.used",
                     text(name, GOLD),
@@ -182,6 +192,46 @@ public class NameManager {
                 this.getUUIDFromName(name),
                 name
         );
+    }
+
+    private @Nullable UUID resolveRealUuid(@NotNull String name) {
+        var cached = Bukkit.getOfflinePlayerIfCached(name);
+        if (cached != null
+                && cached.getUniqueId().version() == 4                       
+                && !profileRepository.existsByUUID(cached.getUniqueId())) { 
+            return cached.getUniqueId();
+        }
+
+        return fetchMojangUuid(name);
+    }
+
+    private @Nullable UUID fetchMojangUuid(@NotNull String name) {
+        try {
+            var client = java.net.http.HttpClient.newBuilder()
+                    .connectTimeout(java.time.Duration.ofSeconds(5))
+                    .build();
+            var request = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create("https://api.mojang.com/users/profiles/minecraft/" + name))
+                    .timeout(java.time.Duration.ofSeconds(5))
+                    .GET()
+                    .build();
+            var response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                return null;   // 204/404 -> no such account
+            }
+            var matcher = java.util.regex.Pattern.compile("\"id\"\\s*:\\s*\"([0-9a-fA-F]{32})\"").matcher(response.body());
+            if (!matcher.find()) {
+                return null;
+            }
+            var hex = matcher.group(1);
+            var dashed = "%s-%s-%s-%s-%s".formatted(
+                    hex.substring(0, 8), hex.substring(8, 12), hex.substring(12, 16),
+                    hex.substring(16, 20), hex.substring(20));
+            return UUID.fromString(dashed);
+        } catch (Throwable e) {
+            log.warning("Failed to resolve Mojang UUID for '%s': %s".formatted(name, e.getMessage()));
+            return null;
+        }
     }
 
     /**
