@@ -52,7 +52,9 @@ name-style: gray, italic
 prevent-kicking: ON_SPAWNING
 
 # whether fake players should be removed when the creator leaves the server
-follow-quiting: true
+# off by default in this fork: fake players are meant to run technical machines
+# and should persist whether or not their creator is online.
+follow-quiting: false
 
 # whether fake players will drop items from their inventory when they are removed / killed
 drop-inventory-on-quiting: false

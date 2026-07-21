@@ -217,7 +217,7 @@ public class FakeplayerConfig {
     private void reload(@NotNull FileConfiguration file) {
         this.playerLimit = maxIfZero(file.getInt("player-limit", 1));
         this.serverLimit = maxIfZero(file.getInt("server-limit", 1000));
-        this.followQuiting = file.getBoolean("follow-quiting", true);
+        this.followQuiting = file.getBoolean("follow-quiting", false);
         this.detectIp = file.getBoolean("detect-ip", false);
         this.kaleTps = file.getInt("kale-tps", 0);
         this.selfCommands = file.getStringList("self-commands");

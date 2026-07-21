@@ -45,7 +45,6 @@ public class PlayerCommand {
     private final KillCommand killCommand;
     private final KillallCommand killallCommand;
     private final ListCommand listCommand;
-    private final ConfigCommand configCommand;
     private final StatusCommand statusCommand;
     private final TeleportCommand teleportCommand;
     private final MoveCommand moveCommand;
@@ -64,7 +63,6 @@ public class PlayerCommand {
             KillCommand killCommand,
             KillallCommand killallCommand,
             ListCommand listCommand,
-            ConfigCommand configCommand,
             StatusCommand statusCommand,
             TeleportCommand teleportCommand,
             MoveCommand moveCommand,
@@ -81,7 +79,6 @@ public class PlayerCommand {
         this.killCommand = killCommand;
         this.killallCommand = killallCommand;
         this.listCommand = listCommand;
-        this.configCommand = configCommand;
         this.statusCommand = statusCommand;
         this.teleportCommand = teleportCommand;
         this.moveCommand = moveCommand;
@@ -110,7 +107,6 @@ public class PlayerCommand {
                 reloadCommand.reload(ctx.getSource().getSender());
                 return Command.SINGLE_SUCCESS;
             }));
-            root.then(buildConfig());
             root.then(buildDebug());
 
             var nameArg = Commands.argument("name", StringArgumentType.word())
@@ -226,16 +222,6 @@ public class PlayerCommand {
         move.then(literal("left").executes(withFake((s, f) -> moveCommand.move(f, 0, 1))));
         move.then(literal("right").executes(withFake((s, f) -> moveCommand.move(f, 0, -1))));
         return move;
-    }
-
-    private LiteralArgumentBuilder<CommandSourceStack> buildConfig() {
-        return literal("config")
-                .executes(ctx -> {
-                    if (ctx.getSource().getSender() instanceof Player p) {
-                        configCommand.listConfig(p);
-                    }
-                    return Command.SINGLE_SUCCESS;
-                });
     }
 
     private LiteralArgumentBuilder<CommandSourceStack> buildDebug() {
